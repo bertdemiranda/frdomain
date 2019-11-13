@@ -1,0 +1,9 @@
+[package]
+name = "listing16"
+version = "0.1.0"
+authors = ["Bert de Miranda <info@bertdemiranda.nl>"]
+edition = "2018"
+
+[dependencies]
+bigdecimal = "0.1"
+chrono = "0.4"

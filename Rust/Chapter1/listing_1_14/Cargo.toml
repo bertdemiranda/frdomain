@@ -1,0 +1,12 @@
+[package]
+name = "listing_1_14"
+version = "0.1.0"
+authors = ["Bert de Miranda <info@bertdemiranda.nl>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+#async-std = "0.99.12"
+futures = "0.3"
+rand = "0.7.2"
