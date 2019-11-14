@@ -6,8 +6,8 @@ You can compile and run them via Cargo; you need Rust Stable 1.39 or later.
 
 When you `install Nix <https://nixos.org/nix/manual/#sect-single-user-installation>`_ you can start a Nix Shell via shell.nix that has the proper Rust and Cargo available.
 
-Seealso
--------
+See also
+--------
 
 Rust
 ~~~~
