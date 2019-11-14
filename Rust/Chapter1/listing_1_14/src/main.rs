@@ -5,8 +5,8 @@ type Amount = i32;
 type AmountResult = Result<Amount, String>;
 
 async fn get_currency_balance() -> AmountResult {
-    Ok(100)
-    //Err(String::from("Error calculating the currency balance"))
+    //Ok(100)
+    Err(String::from("Error calculating the currency balance"))
 }
 
 async fn get_equity_balance() -> AmountResult {

@@ -1,3 +1,5 @@
+#[allow(dead_code)]
+
 extern crate chrono;
 
 use bigdecimal::{BigDecimal, FromPrimitive};
@@ -5,7 +7,6 @@ use chrono::prelude::*;
 
 // The Account data
 // ----------------
-#[allow(dead_code)]
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 pub struct Amount {
     amount: BigDecimal,
@@ -41,17 +42,17 @@ pub struct Account {
     no: String,
     name: String,
     date_of_opening: Date<Local>,
-    //balance: Amount,
+    balance: Amount,
 }
 
-// impl Account {
-//     fn new(no: String, name: String) -> Account {
-//         Account {no, name,
-//             date_of_opening: Local::now().date(),
-//             balance: Amount::new(0),
-//         }
-//     }
-// }
+impl Account {
+    fn new(no: String, name: String, date_of_opening: Date<Local>) -> Account {
+        Account {no, name,
+            date_of_opening,
+            balance: Amount::new(0),
+        }
+    }
+}
 
 pub struct Customer {
     name: String,
@@ -64,7 +65,7 @@ mod verifications {
 
     pub fn verify_record(customer: Customer) -> Result<Customer, String> {
         //Ok(customer)
-        Err(String::from("Don't know this person!"))
+        Err(String::from("We don't know this person!!!"))
     }
 }
 
@@ -84,7 +85,7 @@ mod account_service {
     pub fn open_checking_account(customer: Customer, effective_date: Date<Local>) -> Result<Account, String> {
         //..
         let no = String::from("acc1");
-        Ok(Account {no, name: customer.name, date_of_opening: effective_date})
+        Ok(Account::new(no, customer.name, effective_date))
     }
 }
 

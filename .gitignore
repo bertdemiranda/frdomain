@@ -27,3 +27,5 @@ project/plugins/project/
 # Rust Cargo specific
 **/Cargo.lock
 target/
+Rust/Chapter1/shell.nix
+Rust/Chapter2/shell.nix

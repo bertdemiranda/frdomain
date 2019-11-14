@@ -1,12 +1,12 @@
+#![allow(dead_code)]
+
 extern crate chrono;
 
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::prelude::*;
-//use chrono::offset::LocalResult;
 
 // The Account data
 // ----------------
-#[allow(dead_code)]
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Amount {
     amount: BigDecimal,
@@ -36,7 +36,6 @@ impl Amount {
     // }
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Account {
     no: String,
