@@ -11,47 +11,63 @@ struct Account {
     name:   String,
 }
 
-trait Interest {
-    fn calculate_interest(&self, _period: Duration) -> Result<Amount, String> {
-        Err(String::from("The account has to be a savings account."))
-    }
-}
-
 struct CheckingAccount {
     base_data: Account,
 }
 
-impl Interest for CheckingAccount {}
-
-struct SavingsAccount {
-    base_data: Account,
+struct InterestBearingAccount
+{
     rate_of_interest: BigDecimal,
 }
 
-impl Interest for SavingsAccount {
-    fn calculate_interest(&self, _period: Duration) -> Result<Amount, String> {
-        let _rate = &self.rate_of_interest;
+impl InterestBearingAccount {
+    fn calc_interest(&self, _period: Duration) -> Result<Amount, String> {
         Ok(BigDecimal::from_str(&String::from("1.5")).unwrap()) 
+    }
+}
+
+struct SavingsAccount {
+    base_data:     Account,
+    interest_data: InterestBearingAccount,
+}
+
+impl SavingsAccount {
+    fn new(base_data: Account, rate_of_interest: BigDecimal) -> SavingsAccount {
+        SavingsAccount {
+            base_data, 
+            interest_data: InterestBearingAccount { rate_of_interest },
+        }
+    }
+
+    fn calculate_interest(&self, _period: Duration) -> Result<Amount, String> {
+        self.interest_data.calc_interest(_period)
+    }
+}
+
+struct MoneyMarketAccount {
+    base_data:     Account,
+    interest_data: InterestBearingAccount,
+}
+
+impl MoneyMarketAccount {
+    // fn new(base_data: Account, rate_of_interest: BigDecimal) -> MoneyMarketAccount {
+    //     // ...
+    // }
+
+    fn calculate_interest(&self, _period: Duration) -> Result<Amount, String> {
+        self.interest_data.calc_interest(_period)
     }
 }
 
 fn main() {
     let dur = 1;
 
-    let a = CheckingAccount{
-        base_data: Account {
-            number: String::from("acc1"),
-            name:   String::from("john"),
-        },
-    };
-    println!("Interest = {:?}", a.calculate_interest(dur));
-
-    let b = SavingsAccount{
-        base_data: Account {
+    let b = SavingsAccount::new(
+        Account {
             number: String::from("acc2"),
             name:   String::from("john"),
         },
-        rate_of_interest: BigDecimal::from_str(&String::from("2.5")).unwrap(),
-    };
+        BigDecimal::from_str(&String::from("2.5")).unwrap()
+    );
     println!("Interest = {:?}", b.calculate_interest(dur));
 }
