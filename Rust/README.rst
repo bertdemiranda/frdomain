@@ -22,6 +22,8 @@ Rust
 
 `Asynchronous Programming in Rust <https://rust-lang.github.io/async-book/01_getting_started/01_chapter.html>`_
 
+`Scala Developer Journey into Rust (7 parts) <http://blog.madhukaraphatak.com/categories/rust-scala/>`_
+
 Nix
 ~~~
 
