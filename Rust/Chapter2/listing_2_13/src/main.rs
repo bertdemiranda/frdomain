@@ -24,14 +24,14 @@ fn get_currency_balance(account: &SavingsAccount) -> Result<BigDecimal, String> 
     Ok(bigdec("1000"))
 } 
 
-fn calculate_net_asset(account: &SavingsAccount, ccy_balance: &BigDecimal, interest: BigDecimal) -> Result<BigDecimal, String> {
+fn calculate_net_asset_value(account: &SavingsAccount, ccy_balance: &BigDecimal, interest: BigDecimal) -> Result<BigDecimal, String> {
     Ok(ccy_balance + interest + bigdec("200"))
 }
 
 fn do_calculate(account: &SavingsAccount) -> Result<(&SavingsAccount, BigDecimal), String> {
     let b = get_currency_balance(account)?;
     let i = calculate_interest(account, &b)?;
-    let v = calculate_net_asset(account, &b, i)?;
+    let v = calculate_net_asset_value(account, &b, i)?;
     Ok((account, v))
 }
 
