@@ -1,5 +1,9 @@
 #![allow(dead_code)]
 
+// TODO: 
+//     Add generics?
+//     Add example objects and calls
+
 use bigdecimal::BigDecimal;
 use std::str::FromStr;
 use std::collections::HashMap;
