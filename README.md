@@ -10,4 +10,4 @@ From the book page:
 The Rust branch
 ---------------
 
-The Rust folder contains/will contain my attempt to implement in Rust the Scala code presented in the book. At present (14 November 2019) the code from chapter 1 is available and chapter 2 is a work in progress.
+The Rust folder contains/will contain my attempt to implement in Rust the Scala code presented in the book. At present (29 November 2019) the code from chapters 1 and 2 is available and chapter 3 is a work in progress.
