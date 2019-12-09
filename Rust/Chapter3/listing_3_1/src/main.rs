@@ -59,26 +59,24 @@ fn main() {
     println!("Hello, AccountService!");
 }
 
-#[cfg(test)]
+/// Do a credit and then a debit of the same amount.
+/// Return the resulting account.
+fn credit_debit(account_service: AcctService, account: Account, amount: f64) -> Result<Account, String> {
+    let bigdec_amount = BigDecimal::from_f64(amount).unwrap();
+    let a = account_service.credit(account, &bigdec_amount)?;
+    let b = account_service.debit (a,       &bigdec_amount)?;
+    Ok(b)
+}
+
 #[macro_use]
 extern crate quickcheck;
-
 #[cfg(test)]
 mod quickcheck_tests {
     use crate::*;
 
-    /// Do a credit and then a debit of the same amount.
-    /// Return the resulting account.
-    fn credit_debit(account_service: AcctService, account: Account, amount: f64) -> Result<Account, String> {
-        let bigdec_amount = BigDecimal::from_f64(amount).unwrap();
-        let a = account_service.credit(account, &bigdec_amount)?;
-        let b = account_service.debit (a,       &bigdec_amount)?;
-        Ok(b)
-    }
-
     quickcheck! {
         fn credit_and_debit_with_same_amount_in_sequence_retain_the_same_balance(amount: f64) -> bool {
-            // Use an f64 amount here, because trait Arbitrary is not implemented for type BigDecimal.
+            // Use an f64 amount here, because trait Arbitrary is not implemented for type BigDecimal in quickcheck.
             let account_service = AcctService{};
             let a               = account_service.open("a0001", "me", Some(Local::now().date())).unwrap();
             let balance_before  = bigdec("1000000");
@@ -89,6 +87,30 @@ mod quickcheck_tests {
                 }
             }
             false
+        }
+    }
+}
+
+#[cfg(test)]
+mod proptest_tests {
+    use crate::*;
+    use proptest::prelude::*;
+
+    proptest! {
+        #[test]
+        fn credit_and_debit_with_same_amount_in_sequence_retain_the_same_balance(amount: f64) {
+            // Use an f64 amount here, because trait Arbitrary is not implemented for type BigDecimal in proptest.
+            let account_service = AcctService{};
+            let a               = account_service.open("a0001", "me", Some(Local::now().date())).unwrap();
+            let balance_before  = bigdec("1000000");
+
+            if let Ok(b) = account_service.credit(a, &balance_before) {
+                if let Ok(c) = credit_debit(account_service, b, amount) {
+                    prop_assert_eq!(account_service.balance(c), Ok(balance_before));
+                    return Ok(());
+                }
+            }
+            prop_assert!(false);
         }
     }
 }

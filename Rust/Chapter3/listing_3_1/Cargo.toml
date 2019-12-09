@@ -9,5 +9,6 @@ edition = "2018"
 [dependencies]
 bigdecimal = "0.1"
 chrono = "0.4"
+proptest = "0.9.4"
 quickcheck = "0.9"
 quickcheck_macros = "0.8"
