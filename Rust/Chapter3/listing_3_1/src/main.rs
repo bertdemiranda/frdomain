@@ -109,6 +109,7 @@ mod proptest_tests {
                     prop_assert_eq!(account_service.balance(c), Ok(balance_before));
                     return Ok(());
                 }
+                prop_assert!(false);
             }
             prop_assert!(false);
         }
