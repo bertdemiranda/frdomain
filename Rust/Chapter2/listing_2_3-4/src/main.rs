@@ -3,6 +3,14 @@
 use bigdecimal::{BigDecimal, FromPrimitive};
 use std::str::FromStr;
 
+fn bigdec(s: &str) -> BigDecimal {
+    BigDecimal::from_str(s).unwrap()
+}
+
+fn bigdec0() -> BigDecimal {
+    BigDecimal::from_i32(0).unwrap()
+}
+
 type Amount   = BigDecimal;
 type Duration = i32;
 type AmountResult  = Result<Amount, String>;
@@ -108,25 +116,19 @@ mod account_service {
 fn main() {
     let dur = 10;
 
-    let s = SavingsAccount::new(
-        "john", "acc2",
-        BigDecimal::from_str(&String::from("2.5")).unwrap()
-    );
+    let s = SavingsAccount::new("john", "acc2", bigdec("2.5"));
     println!("Interest = {:?}", s.calculate_interest(dur));
     println!("Interest = {:?}", account_service::calculate_interest(&s, dur));
 
-    let m = MoneyMarketAccount::new(
-        "john", "acc3",
-        BigDecimal::from_str(&String::from("3.5")).unwrap()
-    );
+    let m = MoneyMarketAccount::new("john", "acc3",bigdec("3.5"));
     println!("Interest = {:?}", m.calculate_interest(dur));
     println!("Interest = {:?}", account_service::calculate_interest(&m, dur));
 
     //--------------------------------------------------------------------------------------------------------------------
 
-    let s1 = SavingsAccount::new("dg", "sb001", BigDecimal::from_str(&String::from("0.5")).unwrap());
-    let s2 = SavingsAccount::new("sr", "sb002", BigDecimal::from_str(&String::from("0.75")).unwrap());
-    let s3 = SavingsAccount::new("ty", "sb003", BigDecimal::from_str(&String::from("0.27")).unwrap());
+    let s1 = SavingsAccount::new("dg", "sb001", bigdec("0.5" ));
+    let s2 = SavingsAccount::new("sr", "sb002", bigdec("0.75"));
+    let s3 = SavingsAccount::new("ty", "sb003", bigdec("0.27"));
     
     let dur2 = 5;
 
@@ -139,7 +141,7 @@ fn main() {
     let r3 = vec![s1.clone(), s2.clone(), s3.clone()]
                                 .iter   ()
                                 .map    (|acc| account_service::calculate_interest(acc, dur2))
-                                .fold   (BigDecimal::from_i32(0).unwrap(), |a, e| if let Ok(amt) = e {amt + a} else {a});
+                                .fold   (bigdec0(), |a, e| if let Ok(amt) = e {amt + a} else {a});
     println!("r3 = {:?}", r3);
 
 
@@ -151,19 +153,19 @@ fn main() {
     println!("r4 = {:?}", r4);
 
     fn get_currency_balance(_a: &Account) -> AmountResult {
-        Ok(BigDecimal::from_str(&String::from("500")).unwrap())
+        Ok(bigdec("500"))
     }
     
-    fn get_account_from(_no: String) -> Result<Account, String> {
+    fn get_account_from(_no: &str) -> Result<Account, String> {
         Ok(Account::new("dg", "sb001"))
     }
 
     fn calculate_net_asset_value(_a: &Account, _balance: Amount) -> AmountResult {
-        Ok(BigDecimal::from_str(&String::from("1000")).unwrap())
+        Ok(bigdec("1000"))
     }
 
     fn list_net_asset_value() -> Result<(Account, Amount), String> {
-        let s = get_account_from(String::from("a1"))?;
+        let s = get_account_from("a1")?;
         let b = get_currency_balance(&s)?;
         let v = calculate_net_asset_value(&s, b)?;
         Ok((s,v))
