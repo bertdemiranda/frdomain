@@ -3,6 +3,10 @@
 use bigdecimal::BigDecimal;
 use std::str::FromStr;
 
+fn bigdec(s: &str) -> BigDecimal {
+    BigDecimal::from_str(s).unwrap()
+}
+
 type Amount   = BigDecimal;
 type Duration = u32;
 
@@ -22,7 +26,7 @@ struct InterestBearingAccount
 
 impl InterestBearingAccount {
     fn calc_interest(&self, _period: Duration) -> Result<Amount, String> {
-        Ok(BigDecimal::from_str(&String::from("1.5")).unwrap()) 
+        Ok(bigdec("1.5")) 
     }
 }
 
