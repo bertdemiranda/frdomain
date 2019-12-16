@@ -1,7 +1,11 @@
 #![allow(dead_code)]
 
-use bigdecimal::{BigDecimal, FromPrimitive};
+use bigdecimal::BigDecimal;
 use std::str::FromStr;
+
+fn bigdec(s: &str) -> BigDecimal {
+    BigDecimal::from_str(s).unwrap()
+}
 
 type Amount   = BigDecimal;
 type Duration = i32;
@@ -14,8 +18,8 @@ struct Balance {
 }
 
 impl Balance {
-    fn new_i32(b: i32) -> Balance {
-        Balance {amount: BigDecimal::from_i32(b).unwrap()}
+    fn new(b: &str) -> Balance {
+        Balance {amount: bigdec(b)}
     }
 }
 
@@ -64,15 +68,15 @@ fn main() {
     let deduct_tax =
         |interest: BigDecimal| {
         let i = &interest;
-        if i < &BigDecimal::from_i32(1000).unwrap() {
+        if i < &bigdec("1000") {
             i.clone()
         } else {
-            i - BigDecimal::from_str("0.1").unwrap() * i
+            i - bigdec("0.1") * i
         }};
         
-    let a1 = SavingsAccount::new("a-0001", "ibm",    Balance::new_i32( 100000), BigDecimal::from_str("0.12").unwrap());
-    let a2 = SavingsAccount::new("a-0002", "google", Balance::new_i32(2000000), BigDecimal::from_str("0.13").unwrap());
-    let a3 = SavingsAccount::new("a-0003", "chase",  Balance::new_i32( 125000), BigDecimal::from_str("0.15").unwrap());
+    let a1 = SavingsAccount::new("a-0001", "ibm",    Balance::new( "100000"), bigdec("0.12"));
+    let a2 = SavingsAccount::new("a-0002", "google", Balance::new("2000000"), bigdec("0.13"));
+    let a3 = SavingsAccount::new("a-0003", "chase",  Balance::new( "125000"), bigdec("0.15"));
 
     let accounts = vec![a1, a2, a3];
 
