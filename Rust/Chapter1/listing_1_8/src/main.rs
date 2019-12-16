@@ -45,8 +45,8 @@ pub struct Account {
 }
 
 impl Account {
-    fn new(no: String, name: String) -> Account {
-        Account {no, name,
+    fn new(no: &str, name: &str) -> Account {
+        Account {no: String::from(no), name: String::from(name),
             date_of_opening: Local::now().date(),
             balance: Amount::new(0),
         }
@@ -103,7 +103,7 @@ mod account_service {
 fn main() {
     use account_service::{credit, logged_debit};
 
-    let a = Account::new(String::from("a1"), String::from("Joe"));
+    let a = Account::new("a1", "Joe");
     let b = credit(a, Amount::new(1000)).unwrap();
     logged_debit(b, Amount::new(500));
 }
