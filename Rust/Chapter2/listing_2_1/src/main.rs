@@ -13,10 +13,14 @@ struct Account {
     account_type: AccountType,
 }
 
+fn bigdec(s: &str) -> BigDecimal {
+    BigDecimal::from_str(s).unwrap()
+}
+
 fn calculate_interest(account: Account, _period: Duration) -> Result<Amount, String> {
     match account.account_type {
         AccountType::SAVINGS => { 
-            Ok(BigDecimal::from_str(&String::from("1.5")).unwrap()) 
+            Ok(bigdec("1.5")) 
         },
         _ => { Err(String::from("The account has to be a savings account.")) },
     }
