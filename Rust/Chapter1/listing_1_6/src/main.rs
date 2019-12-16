@@ -45,8 +45,8 @@ pub struct Account {
 }
 
 impl Account {
-    fn new(no: String, name: String) -> Account {
-        Account {no, name,
+    fn new(no: &str, name: &str) -> Account {
+        Account {no: String::from(no), name: String::from(name),
             date_of_opening: Local::now().date(),
             balance: Amount::new(0),
         }
@@ -140,6 +140,6 @@ mod tests {
     }
 
     fn new_account() -> Account {
-        Account::new(String::from("a1"), String::from("John"))
+        Account::new("a1", "John")
     }
 }
