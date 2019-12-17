@@ -62,11 +62,16 @@ impl Account {
 
 // The AccountService functions
 // ----------------------------
-mod account_service {
-    use crate::Account;
-    use crate::Amount;
 
-    pub fn debit(a: Account, amount: Amount) -> Result<Account, String> {
+struct AccountService {}
+
+trait AcctSrv {
+    fn debit (a: Account, amount: Amount) -> Result<Account, String>;
+    fn credit(a: Account, amount: Amount) -> Result<Account, String>;
+}
+
+impl AcctSrv for AccountService {
+    fn debit(a: Account, amount: Amount) -> Result<Account, String> {
         if a.balance < amount {
             Err(String::from("Insufficient balance in account"))
         }
@@ -75,19 +80,19 @@ mod account_service {
         }
     }
 
-    pub fn credit(a: Account, amount: Amount) -> Result<Account, String> {
+    fn credit(a: Account, amount: Amount) -> Result<Account, String> {
         Ok(Account{balance: a.balance + amount, ..a})
     }
+
 }
 
 fn main() {
-    println!("All Ok?");
+    println!("Are all tests Ok?");
 }
 
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use account_service::{credit, debit};
     
     #[test]
     fn new_account_has_balance_0() {
@@ -97,25 +102,25 @@ mod tests {
 
     #[test]
     fn credit_account() {
-        let a = new_account();
-        let b = credit(a, Amount::new(1000)).unwrap();
+        let a   = new_account();
+        let b   = AccountService::credit(a, Amount::new(1000)).unwrap();
         assert!(b.balance == Amount::new(1000));
     }
 
     #[test]
     fn debit_account_sufficient_balance() {
-        let a = new_account();
-        let b = credit(a, Amount::new(1000)).unwrap();
-        let c = debit (b, Amount::new( 500)). unwrap();
+        let a   = new_account();
+        let b   = AccountService::credit(a, Amount::new(1000)).unwrap();
+        let c   = AccountService::debit (b, Amount::new( 500)).unwrap();
         assert_eq!(c.balance, Amount::new(500));
     }
 
     #[test]
     fn debit_account_insufficient_balance() {
         let a = new_account();
-        let b = credit(a, Amount::new(1000)).unwrap();
+        let b = AccountService::credit(a, Amount::new(1000)).unwrap();
         assert_eq!(
-            match debit(b, Amount::new(1500)) {
+            match AccountService::debit(b, Amount::new(1500)) {
                 Err(errtext) => errtext,
                 _ => String::from("An amount!")
             }, String::from("Insufficient balance in account")
@@ -126,9 +131,9 @@ mod tests {
     fn credit_debit_debit_account_sufficient_balance() {
         fn operations() -> Result<Amount, String> {
             let a = new_account();
-            let b = credit(a, Amount::new(1000))?;
-            let c = debit (b, Amount::new( 200))?;
-            let d = debit (c, Amount::new( 190))?;
+            let b = AccountService::credit(a, Amount::new(1000))?;
+            let c = AccountService::debit (b, Amount::new( 200))?;
+            let d = AccountService::debit (c, Amount::new( 190))?;
             Ok(d.balance)
         }
         assert_eq!(operations(), Ok(Amount::new(610)));
@@ -138,9 +143,9 @@ mod tests {
     fn credit_debit_debit_account_insufficient_balance() {
         fn operations() -> Result<Amount, String> {
             let a = new_account();
-            let b = credit(a, Amount::new(1000))?;
-            let c = debit (b, Amount::new(1500))?;
-            let d = debit (c, Amount::new( 200))?;
+            let b = AccountService::credit(a, Amount::new(1000))?;
+            let c = AccountService::debit (b, Amount::new(1500))?;
+            let d = AccountService::debit (c, Amount::new( 200))?;
             Ok(d.balance)
         }
         assert_eq!(operations(), Err(String::from("Insufficient balance in account")));
