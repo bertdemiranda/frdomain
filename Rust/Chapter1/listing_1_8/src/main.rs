@@ -4,6 +4,7 @@ extern crate chrono;
 
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::prelude::*;
+use std::ops::{Add, Sub};
 
 // The Account data
 // ----------------
@@ -19,21 +20,27 @@ impl Amount {
         }
     }
 
-    pub fn add(&self, amount: Amount) -> Amount {
+    // pub fn get_amount(&self) -> BigDecimal {
+    //     self.amount.clone()
+    // }
+}
+
+impl Add for Amount {
+    type Output = Amount;
+    fn add(self, amount: Amount) -> Amount {
         Amount {
             amount: &self.amount + amount.amount
         }
     }
+}
 
-    pub fn sub(&self, amount: Amount) -> Amount {
+impl Sub for Amount {
+    type Output = Amount;
+    fn sub(self, amount: Amount) -> Amount {
         Amount {
             amount: &self.amount - amount.amount
         }
     }
-
-    // pub fn get_amount(&self) -> BigDecimal {
-    //     self.amount.clone()
-    // }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -64,12 +71,12 @@ mod account_service {
             Err(String::from("Insufficient balance in account"))
         }
         else {
-            Ok(Account{balance: a.balance.sub(amount), ..a})
+            Ok(Account{balance: a.balance - amount, ..a})
         }
     }
 
     pub fn credit(a: Account, amount: Amount) -> Result<Account, String> {
-        Ok(Account{balance: a.balance.add(amount), ..a})
+        Ok(Account{balance: a.balance + amount, ..a})
     }
 
     fn generate_audit_log(a: Account, amount: Amount) -> Result<String, String> {

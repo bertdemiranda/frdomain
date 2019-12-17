@@ -4,6 +4,7 @@ extern crate chrono;
 
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::prelude::*;
+use std::ops::{Add, Sub};
 
 // The Account data
 // ----------------
@@ -16,18 +17,6 @@ impl Amount {
     pub fn new(amount: i64) -> Amount {
         Amount {
             amount: BigDecimal::from_i64(amount).unwrap()
-        }
-    }
-
-    pub fn add(&self, amount: Amount) -> Amount {
-        Amount {
-            amount: &self.amount + amount.amount
-        }
-    }
-
-    pub fn sub(&self, amount: Amount) -> Amount {
-        Amount {
-            amount: &self.amount - amount.amount
         }
     }
 

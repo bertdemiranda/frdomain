@@ -2,7 +2,7 @@
 extern crate chrono;
 
 use bigdecimal::{BigDecimal, FromPrimitive};
-use std::str::FromStr;
+use std::ops::Add;
 use chrono::prelude::*;
 
 struct Account {
@@ -45,9 +45,10 @@ fn bigdec(i: i64) -> BigDecimal {
     BigDecimal::from_i64(i).unwrap()
 }
 
-impl Amount {
-    fn add(&self, that: Amount) -> Amount {
-        assert!(self.c == that.c);
+impl Add for Amount {
+    type Output = Amount;
+    fn add(self, that: Amount) -> Amount {
+        assert!(&self.c == &that.c);
         Amount {
             a: &self.a + &that.a, 
             c: self.c
@@ -74,7 +75,7 @@ fn get_holding(account: Account) -> Amount {
         Amount{a: a, c: e.issue_currency}
     };
 
-    let get_accrued_interest = |i: String, c: Currency| {
+    let get_accrued_interest = |_i: String, c: Currency| {
         Amount{a: bigdec(300), c: c}
     };
 
@@ -82,7 +83,7 @@ fn get_holding(account: Account) -> Amount {
         Balance{amount: a, ins: Instrument::Ccy(c), as_of: _} => Amount{a,c},
         Balance{amount: a, ins: Instrument::Eqy(e), as_of: _} => get_market_value(e,a),
         Balance{amount: a, ins: Instrument::Fin(f), as_of: _} => {
-            Amount{a: f.nominal*a, c: f.issue_currency}.add(get_accrued_interest(f.isin, f.issue_currency))
+            Amount{a: f.nominal*a, c: f.issue_currency} + get_accrued_interest(f.isin, f.issue_currency)
         }
     }
 }
