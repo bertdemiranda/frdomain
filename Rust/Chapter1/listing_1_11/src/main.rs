@@ -4,7 +4,6 @@ extern crate chrono;
 
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::prelude::*;
-use std::ops::{Add, Sub};
 
 // The Account data
 // ----------------
@@ -19,10 +18,6 @@ impl Amount {
             amount: BigDecimal::from_i64(amount).unwrap()
         }
     }
-
-    // pub fn get_amount(&self) -> BigDecimal {
-    //     self.amount.clone()
-    // }
 }
 
 #[allow(dead_code)]
@@ -66,30 +61,32 @@ mod verifications {
 
 // The AccountService functions
 // ----------------------------
-mod account_service {
-    use chrono::prelude::*;
-    use crate::Account;
-    //...use crate::Amount;
-    use crate::Customer;
-    use crate::verifications::verify_record;
+struct AccountService {}
 
-    pub fn verify_customer(customer: Customer) -> Result<Customer, String> {
+trait AccountServiceFns {
+    fn verify_customer(customer: Customer) -> Result<Customer, String>;
+    fn open_checking_account(customer: Customer, effective_date: Date<Local>) -> Result<Account, String>;
+}
+
+use crate::verifications::verify_record;
+
+impl AccountServiceFns for AccountService {
+
+    fn verify_customer(customer: Customer) -> Result<Customer, String> {
         verify_record(customer)
     }
 
-    pub fn open_checking_account(customer: Customer, effective_date: Date<Local>) -> Result<Account, String> {
+    fn open_checking_account(customer: Customer, effective_date: Date<Local>) -> Result<Account, String> {
         //..
         Ok(Account::new("acc1", &customer.name, effective_date))
     }
 }
 
 fn main() {
-    use account_service::{verify_customer, open_checking_account};
-
     let cust = Customer::new("customer1");
     match
-        verify_customer(cust)
-            .and_then(|c| open_checking_account(c, Local::now().date())) {
+    AccountService::verify_customer(cust)
+            .and_then(|c| AccountService::open_checking_account(c, Local::now().date())) {
         Err(e) => println!("{}", e),
         Ok(_)  => (),
     }
