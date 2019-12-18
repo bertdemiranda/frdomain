@@ -62,11 +62,15 @@ impl Account {
 
 // The AccountService functions
 // ----------------------------
-mod account_service {
-    use crate::Account;
-    use crate::Amount;
+struct AccountService {}
 
-    pub fn debit(a: Account, amount: Amount) -> Result<Account, String> {
+trait AccountServiceFns {
+    fn debit (a: Account, amount: Amount) -> Result<Account, String>;
+    fn credit(a: Account, amount: Amount) -> Result<Account, String>;
+}
+
+impl AccountServiceFns for AccountService {
+    fn debit(a: Account, amount: Amount) -> Result<Account, String> {
         if a.balance < amount {
             Err(String::from("Insufficient balance in account"))
         }
@@ -75,42 +79,41 @@ mod account_service {
         }
     }
 
-    pub fn credit(a: Account, amount: Amount) -> Result<Account, String> {
+    fn credit(a: Account, amount: Amount) -> Result<Account, String> {
         Ok(Account{balance: a.balance + amount, ..a})
     }
 
-    fn generate_audit_log(a: Account, amount: Amount) -> Result<String, String> {
-        Ok(format!("Debited {} from {}", amount.amount, a.name))
-    }
+}
 
-    fn write(line: String) {
-        println!("{}", line);
-    }
+fn generate_audit_log(a: Account, amount: Amount) -> Result<String, String> {
+    Ok(format!("Debited {} from {}", amount.amount, a.name))
+}
 
-    pub fn logged_debit(source: Account, amount: Amount) {
-        // Longer:
-        /* ------ 
-        match 
-            debit(source, amount.clone())
-                .and_then(|b| generate_audit_log(b, amount.clone())) {
-                    Ok(line) => write(line),
-                    _        => (),
-        };
-        */
-        // or shorter:
-        // ----------
-        if let Ok(line) = 
-            debit(source, amount.clone())
-                .and_then(|b| generate_audit_log(b, amount)) {
-                    write(line);
-        }
+fn write(line: String) {
+    println!("{}", line);
+}
+
+pub fn logged_debit(source: Account, amount: Amount) {
+    // Longer:
+    /* ------ 
+    match 
+        AccountService::debit(source, amount.clone())
+            .and_then(|b| generate_audit_log(b, amount.clone())) {
+                Ok(line) => write(line),
+                _        => (),
+    };
+    */
+    // or shorter:
+    // ----------
+    if let Ok(line) = 
+        AccountService::debit(source, amount.clone())
+            .and_then(|b| generate_audit_log(b, amount)) {
+                write(line);
     }
 }
 
 fn main() {
-    use account_service::{credit, logged_debit};
-
     let a = Account::new("a1", "Joe");
-    let b = credit(a, Amount::new(1000)).unwrap();
+    let b = AccountService::credit(a, Amount::new(1000)).unwrap();
     logged_debit(b, Amount::new(500));
 }
