@@ -10,7 +10,7 @@ fn bigdec(s: &str) -> BigDecimal {
     BigDecimal::from_str(s).unwrap()
 }
 
-trait AccountService<Account, Amount, Balance> {
+trait AccountServiceFns<Account, Amount, Balance> {
     fn open    (&self, no: &str, name: &str, 
                 opening_date: Option<Date<Local>>) ->                 Result<Account, String>;
     fn close   (&self, account: Account, 
@@ -54,9 +54,9 @@ impl Balance {
 }
 
 #[derive(Clone, Copy)]
-struct AcctService{}
+struct AccountService{}
 
-impl AccountService<Account, Amount, Balance> for AcctService {
+impl AccountServiceFns<Account, Amount, Balance> for AccountService {
     fn open    (&self, no: &str, name: &str, 
             opening_date: Option<Date<Local>>) ->             Result<Account, String> {
         if no.is_empty() || name.is_empty() {
@@ -98,12 +98,12 @@ impl AccountService<Account, Amount, Balance> for AcctService {
 }
 
 fn main() {
-    println!("Hello, AccountService!");
+    println!("Hello, AccountServiceFns!");
 }
 
 /// Do a credit and then a debit of the same amount.
 /// Return the resulting account.
-fn credit_debit(account_service: AcctService, account: Account, amount: f64) -> Result<Account, String> {
+fn credit_debit(account_service: AccountService, account: Account, amount: f64) -> Result<Account, String> {
     let bigdec_amount = BigDecimal::from_f64(amount).unwrap();
     let a = account_service.credit(account, &bigdec_amount)?;
     let b = account_service.debit (a,       &bigdec_amount)?;
@@ -119,7 +119,7 @@ mod quickcheck_tests {
     quickcheck! {
         fn credit_and_debit_with_same_amount_in_sequence_retain_the_same_balance(amount: f64) -> bool {
             // Use an f64 amount here, because trait Arbitrary is not implemented for type BigDecimal in quickcheck.
-            let account_service = AcctService{};
+            let account_service = AccountService{};
             let a               = account_service.open("a0001", "me", Some(today())).unwrap();
             let amount_before   = bigdec("1000000");
 
@@ -144,7 +144,7 @@ mod proptest_tests {
         #[test]
         fn credit_and_debit_with_same_amount_in_sequence_retain_the_same_balance(amount: f64) {
             // Use an f64 amount here, because trait Arbitrary is not implemented for type BigDecimal in proptest.
-            let account_service = AcctService{};
+            let account_service = AccountService{};
             let a               = account_service.open("a0001", "me", Some(today())).unwrap();
             let amount_before   = bigdec("1000000");
 
