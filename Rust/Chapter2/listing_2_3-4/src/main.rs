@@ -31,85 +31,74 @@ impl Account {
     }
 }
 
+trait InterestBearingAccount {
+    fn interest_rate(&self) -> Amount;
+}
+
 #[derive(Debug, Clone)]
 struct CheckingAccount {
     base_data: Account,
 }
 
 #[derive(Debug, Clone)]
-struct InterestBearingAccount
-{
-    rate_of_interest: BigDecimal,
-}
-
-impl InterestBearingAccount {
-    fn calc_interest(&self, period: Duration) -> Result<Amount, String> {
-        let per: Option<BigDecimal> = FromPrimitive::from_i32(period);
-        match per {
-            Some(per) => Ok(per * &self.rate_of_interest),
-            _         => Err(String::from("No valid period value"))
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
 struct SavingsAccount {
-    base_data:     Account,
-    interest_data: InterestBearingAccount,
+    base_data:        Account,
+    rate_of_interest: BigDecimal,
 }
 
 impl SavingsAccount {
     fn new(name: &str, number: &str, rate_of_interest: BigDecimal) -> SavingsAccount {
         SavingsAccount {
             base_data:     Account::new(name, number), 
-            interest_data: InterestBearingAccount {rate_of_interest},
+            rate_of_interest,
         }
     }
 
-    fn calc_interest(&self, _period: Duration) -> Result<Amount, String> {
-        self.interest_data.calc_interest(_period)
+    // fn calc_interest(&self, _period: Duration) -> Result<Amount, String> {
+    //     self.interest_data.calc_interest(_period)
+    // }
+}
+
+impl InterestBearingAccount for SavingsAccount {
+    fn interest_rate(&self) -> Amount {
+        self.rate_of_interest.clone()
     }
 }
 
 #[derive(Debug, Clone)]
 struct MoneyMarketAccount {
-    base_data:     Account,
-    interest_data: InterestBearingAccount,
+    base_data:        Account,
+    rate_of_interest: BigDecimal,
 }
 
 impl MoneyMarketAccount {
     fn new(name: &str, number: &str, rate_of_interest: BigDecimal) -> MoneyMarketAccount {
         MoneyMarketAccount {
             base_data:     Account::new(name, number), 
-            interest_data: InterestBearingAccount {rate_of_interest},
+            rate_of_interest,
         }
     }
 
-    fn calc_interest(&self, _period: Duration) -> Result<Amount, String> {
-        self.interest_data.calc_interest(_period)
+    // fn calc_interest(&self, _period: Duration) -> Result<Amount, String> {
+    //     self.interest_data.calc_interest(_period)
+    // }
+}
+
+impl InterestBearingAccount for MoneyMarketAccount {
+    fn interest_rate(&self) -> Amount {
+        self.rate_of_interest.clone()
     }
 }
 
-pub trait Interest {
-    fn calculate_interest(&self, period: Duration) -> Result<Amount, String>;
+struct AccountService {}
+
+trait AccountServiceFns {
+    fn calculate_interest(account: &impl InterestBearingAccount, period: Duration) -> Result<Amount, String>;
 }
 
-impl Interest for SavingsAccount {
-    fn calculate_interest(&self, period: Duration) -> Result<Amount, String> {
-        self.calc_interest(period)
-    }
-}
-
-impl Interest for MoneyMarketAccount {
-    fn calculate_interest(&self, period: Duration) -> Result<Amount, String> {
-        self.calc_interest(period)
-    }
-}
-
-mod account_service {
-    use crate::{Amount, Duration, Interest};
-    pub fn calculate_interest<T: Interest>(account: &T, period: Duration) -> Result<Amount, String> {
-        account.calculate_interest(period)
+impl  AccountServiceFns for AccountService {
+    fn calculate_interest(account: &impl InterestBearingAccount, _period: Duration) -> Result<Amount, String> {
+        Ok(account.interest_rate())
     }
 }
 
@@ -117,12 +106,10 @@ fn main() {
     let dur = 10;
 
     let s = SavingsAccount::new("john", "acc2", bigdec("2.5"));
-    println!("Interest = {:?}", s.calculate_interest(dur));
-    println!("Interest = {:?}", account_service::calculate_interest(&s, dur));
+    println!("Interest = {:?}", AccountService::calculate_interest(&s, dur));
 
     let m = MoneyMarketAccount::new("john", "acc3",bigdec("3.5"));
-    println!("Interest = {:?}", m.calculate_interest(dur));
-    println!("Interest = {:?}", account_service::calculate_interest(&m, dur));
+    println!("Interest = {:?}", AccountService::calculate_interest(&m, dur));
 
     //--------------------------------------------------------------------------------------------------------------------
 
@@ -134,20 +121,20 @@ fn main() {
 
     let r2: AmountResults = vec![s1.clone(), s2.clone(), s3.clone()]
                                 .iter   ()
-                                .map    (|acc| account_service::calculate_interest(acc, dur2))
+                                .map    (|acc| AccountService::calculate_interest(acc, dur2))
                                 .collect();
     println!("r2 = {:?}", r2);
 
     let r3 = vec![s1.clone(), s2.clone(), s3.clone()]
                                 .iter   ()
-                                .map    (|acc| account_service::calculate_interest(acc, dur2))
+                                .map    (|acc| AccountService::calculate_interest(acc, dur2))
                                 .fold   (bigdec0(), |a, e| if let Ok(amt) = e {amt + a} else {a});
     println!("r3 = {:?}", r3);
 
 
     let r4: AmountResults = vec![s1.clone(), s2.clone(), s3.clone()]
                                 .iter   ()
-                                .map    (|acc| account_service::calculate_interest(acc, dur2))
+                                .map    (|acc| AccountService::calculate_interest(acc, dur2))
                                 .filter (|amt| amt.is_ok())
                                 .collect();
     println!("r4 = {:?}", r4);
