@@ -65,12 +65,12 @@ impl Account {
 
 struct AccountService {}
 
-trait AcctSrv {
+trait AccountServiceFns {
     fn debit (a: Account, amount: Amount) -> Result<Account, String>;
     fn credit(a: Account, amount: Amount) -> Result<Account, String>;
 }
 
-impl AcctSrv for AccountService {
+impl AccountServiceFns for AccountService {
     fn debit(a: Account, amount: Amount) -> Result<Account, String> {
         if a.balance < amount {
             Err(String::from("Insufficient balance in account"))
