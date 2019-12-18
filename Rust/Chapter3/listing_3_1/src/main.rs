@@ -68,6 +68,7 @@ fn credit_debit(account_service: AccountService, account: Account, amount: f64) 
     Ok(b)
 }
 
+#[macro_use]
 extern crate quickcheck;
 #[cfg(test)]
 mod quickcheck_tests {
