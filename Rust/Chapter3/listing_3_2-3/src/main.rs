@@ -44,14 +44,22 @@ struct Balance {
     amount: Amount
 }
 
-impl Balance {
-    fn add(self, amount: &Amount) -> Balance {
+use std::ops::{Add, Sub};
+
+impl Add<Amount> for Balance {
+    type Output = Balance;
+    fn add(self, amount: Amount) -> Balance {
         Balance{amount: self.amount + amount}
     }
-    fn sub(self, amount: &Amount) -> Balance {
+}
+
+impl Sub<Amount> for Balance {
+    type Output = Balance;
+    fn sub(self, amount: Amount) -> Balance {
         Balance{amount: self.amount - amount}
     }
 }
+
 
 #[derive(Clone, Copy)]
 struct AccountService{}
@@ -87,10 +95,10 @@ impl AccountServiceFns<Account, Amount, Balance> for AccountService {
         if a.balance.amount < *amount {
             return Err(String::from("Insufficient balance"));
         }
-        Ok(Account{balance: a.balance.sub(amount), ..a})
+        Ok(Account{balance: a.balance - amount.clone(), ..a})
     }
     fn credit  (&self, a: Account, amount: &Amount) ->  Result<Account, String> {
-        Ok(Account{balance: a.balance.add(amount), ..a})
+        Ok(Account{balance: a.balance + amount.clone(), ..a})
     }
     fn balance (&self, a: Account)                  ->  Result<Balance, String> {
         Ok(a.balance)
