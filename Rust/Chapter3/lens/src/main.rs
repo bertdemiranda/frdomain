@@ -1,13 +1,5 @@
 #![allow(dead_code)]
 
-// pub type GetLens<O, V> = fn(o: &O) -> V;
-// pub type SetLens<O, V> = fn(o: &O, v: &V) -> O;
-
-// pub struct Lens<O, V> {
-//     get: GetLens<O, V>,
-//     set: SetLens<O, V>
-// }
-
 mod lens;
 
 mod address {
