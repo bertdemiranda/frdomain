@@ -34,8 +34,8 @@ mod address {
             Address{no: v.clone(), ..o.clone()}
         }
         Lens {
-            get: get_lens,
-            set: set_lens
+            get: Box::new(get_lens),
+            set: Box::new(set_lens)
         }
     }
 }
@@ -59,8 +59,8 @@ mod customer {
             Customer{address: v.clone(), ..o.clone()}
         }
         Lens {
-            get: get_lens,
-            set: set_lens
+            get: Box::new(get_lens),
+            set: Box::new(set_lens)
         }
     }
 }
@@ -72,6 +72,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use crate::*;
+    use crate::lens::{compose_get, compose_set};
     use crate::address::*;
     use crate::customer::*;
     
@@ -103,6 +104,19 @@ mod tests {
     }
 
     #[test]
+    fn compo_get_customer_address_no() {
+        let c = Customer {
+            id: 1,
+            name: String::from("Cust1"),
+            address: Address::new("B-12", "Monroe Street", "Denver", "CO", "80231")
+        };
+        let cal  = customer::address_lens();
+        let anol = address::no_lens();
+        let no   = compose_get(&c, &cal, &anol);
+        assert!(no == "B-12");
+    }
+
+    #[test]
     fn set_customer_address_no() {
         let c1 = Customer {
             id: 1,
@@ -113,6 +127,19 @@ mod tests {
         let csl = customer::address_lens().set;
         let asl = address::no_lens().set;
         let c2  = csl(&c1, &asl(&cgl(&c1), &String::from("A-1")));
+        assert!(c2.address.no == "A-1");
+    }
+
+    #[test]
+    fn compo_set_customer_address_no() {
+        let c1 = Customer {
+            id: 1,
+            name: String::from("Cust1"),
+            address: Address::new("B-12", "Monroe Street", "Denver", "CO", "80231")
+        };
+        let cal  = customer::address_lens();
+        let anol = address::no_lens();
+        let c2   = compose_set(&c1, &String::from("A-1"), &cal, &anol);
         assert!(c2.address.no == "A-1");
     }
 }
