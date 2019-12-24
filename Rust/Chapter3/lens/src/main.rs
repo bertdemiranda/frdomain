@@ -112,7 +112,8 @@ mod tests {
         };
         let cal  = customer::address_lens();
         let anol = address::no_lens();
-        let no   = compose_get(&c, &cal, &anol);
+        let get_cust_addr_no = |c| compose_get(&c, &cal, &anol);
+        let no   = get_cust_addr_no(c);
         assert!(no == "B-12");
     }
 
@@ -139,7 +140,8 @@ mod tests {
         };
         let cal  = customer::address_lens();
         let anol = address::no_lens();
-        let c2   = compose_set(&c1, &String::from("A-1"), &cal, &anol);
+        let set_cust_addr_no = |c, no| compose_set(c, no, &cal, &anol);
+        let c2   = set_cust_addr_no(&c1, &String::from("A-1"));
         assert!(c2.address.no == "A-1");
     }
 }
