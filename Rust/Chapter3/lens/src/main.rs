@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-mod lens;
+#[macro_use] mod lens;
 
 mod address {
     use crate::lens::*;
@@ -38,6 +38,11 @@ mod address {
             set: Box::new(set_lens)
         }
     }
+
+    lens!(street_lens, street, Address, String);
+    lens!(city_lens,   city,   Address, String);
+    lens!(state_lens,  state,  Address, String);
+    lens!(zip_lens,    zip,    Address, String);
 }
 
 mod customer {
@@ -50,6 +55,8 @@ mod customer {
         pub name:    String, 
         pub address: Address
     }
+
+    lens!(name_lens, name, Customer, String);
 
     pub fn address_lens() -> Lens<Customer, Address> {
         fn get_lens(o: &Customer) -> Address {
@@ -84,11 +91,38 @@ mod tests {
     }
 
     #[test]
+    fn get_address_street() {
+        let a  = Address::new("B-12", "Monroe Street", "Denver", "CO", "80231");
+        let gl = address::street_lens().get;
+        assert!(gl(&a) == "Monroe Street");
+    }
+
+    #[test]
     fn set_address_no() {
         let a1 = Address::new("B-12", "Monroe Street", "Denver", "CO", "80231");
         let sl = address::no_lens().set;
         let a2 = sl(&a1, &String::from("Z-99"));
         assert!(a2.no == "Z-99");
+    }
+
+    #[test]
+    fn set_address_street() {
+        let a1 = Address::new("B-12", "Monroe Street", "Denver", "CO", "80231");
+        let sl = address::street_lens().set;
+        let a2 = sl(&a1, &String::from("State Street"));
+        assert!(a2.street == "State Street");
+    }
+
+    #[test]
+    fn get_customer_name() {
+        let c = Customer {
+            id: 1,
+            name: String::from("Cust1"),
+            address: Address::new("B-12", "Monroe Street", "Denver", "CO", "80231")
+        };
+        let cgl = customer::name_lens().get;
+        let cn  = cgl(&c);
+        assert!(cn == "Cust1");
     }
 
     #[test]
@@ -115,6 +149,18 @@ mod tests {
         let get_cust_addr_no = |c| compose_get(&c, &cal, &anol);
         let no   = get_cust_addr_no(c);
         assert!(no == "B-12");
+    }
+
+    #[test]
+    fn set_customer_name() {
+        let c1 = Customer {
+            id: 1,
+            name: String::from("Cust1"),
+            address: Address::new("B-12", "Monroe Street", "Denver", "CO", "80231")
+        };
+        let csl = customer::name_lens().set;
+        let c2  = csl(&c1, &String::from("JohnD"));
+        assert!(c2.name == "JohnD");
     }
 
     #[test]

@@ -30,6 +30,23 @@ pub fn compose_set<Outer, Inner, Value>(
     outer_set(o, &inner_set(&outer_get(o), v))
 }
 
+macro_rules! lens {
+    ($name:ident, $fld:ident, $o:ident, $v:ident) => {
+        pub fn $name() -> Lens<$o, $v> {
+            fn get_lens(o: &$o) -> String { 
+                o.$fld.clone()
+            }
+            fn set_lens(o: &$o, v: &$v) -> $o {
+                $o{$fld: v.clone(), ..o.clone()}
+            }
+            Lens {
+                get: Box::new(get_lens),
+                set: Box::new(set_lens)
+            }
+        }
+    };
+}
+
 //---------------------------------------------------
 //- This does not compile.
 //- Not possible (yet) to get the lifetimes correct!
