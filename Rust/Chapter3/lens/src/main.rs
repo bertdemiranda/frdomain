@@ -191,3 +191,51 @@ mod tests {
         assert!(c2.address.no == "A-1");
     }
 }
+
+#[cfg(test)]
+mod property_tests {
+    use crate::*;
+    use crate::address::*;
+    use proptest::prelude::*;
+
+    proptest! {
+        #[test]
+        fn identity(v: String) {
+            let a1 = Address::new("B-12", "Monroe Street", "Denver", "CO", "80231");
+            let gl = address::street_lens().get;
+            let sl = address::street_lens().set;
+            //
+            let a2     = sl(&a1, &v);
+            let street = gl(&a2);                               // get
+            let a3     = sl(&a1, &street);                      // set back with the same value
+            prop_assert_eq!(a2.street, a3.street);
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn retention(v: String) {
+            let a1 = Address::new("B-12", "Monroe Street", "Denver", "CO", "80231");
+            let gl = address::street_lens().get;
+            let sl = address::street_lens().set;
+            //
+            let a2     = sl(&a1, &v);                           // set with a value
+            let street = gl(&a2);                               // get back the same value?
+            prop_assert_eq!(a2.street, street);
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn double_set(v: String) {
+            let a1 = Address::new("B-12", "Monroe Street", "Denver", "CO", "80231");
+            let gl = address::street_lens().get;
+            let sl = address::street_lens().set;
+            //
+            let a2     = sl(&a1, &String::from("iwptoie"));     // set with a value
+            let a3     = sl(&a2, &v);                           // set again with a value
+            let street = gl(&a3);                               // get back the same value?
+            prop_assert_eq!(a3.street, street);
+        }
+    }
+}
